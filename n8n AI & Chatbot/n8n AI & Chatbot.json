@@ -1,0 +1,862 @@
+{
+  "name": "Test n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "links",
+        "options": {}
+      },
+      "id": "b074a64e-4d09-495e-9cc0-2ee0bd3ed1bd",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        2304,
+        48
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d5f3471a-132a-4645-93f2-e8f9cce5c728",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        2784,
+        528
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "amount": 8
+      },
+      "id": "5deda240-2b98-43a0-912f-4ec0333a8bf4",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        480,
+        80
+      ],
+      "webhookId": "c9cb4878-ae4d-4b8e-bd37-5395011f7761",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "1499f1ac-a7ae-4983-85c7-aa7b8445b2e2",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              },
+              "leftValue": "={{ $json.originalData.score }}",
+              "rightValue": 59
+            },
+            {
+              "id": "1f0505ad-f8b2-4f7b-b0c5-279622abd380",
+              "leftValue": "={{ $json.keepOriginal }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "50fdba0a-95a6-49cf-a019-8e48c1585a15",
+      "name": "Score Filter1",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1856,
+        240
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant that helps match candidates to job opportunities. Your task is to review my resume, then analyze both the resume and job description to calculate a job matching score. Additionally, create a cover letter based on my resume and the job description. The cover letter should contain at least 2 paragraphs and should exclude the name, address, and signature sections from the beginning and end.\nWhen using special characters like quotation marks (\"), ensure they are properly escaped with a backslash. The output must be formatted as valid JSON that can be parsed without errors.\n\nfor example your response should be like: {\njob_ID: {{ $json.jobid }}\n, \njob_title: {{ $json.title }}\n,\nCompany: {{ $json.company }}\n,\njob_location: {{ $json.location }}\n, job_Link: {{ $json.applyUrl }}\n,\"score\": 80, \"coverLetter\": \"sample cover letter\", job_applicants: {{ $json.applicants }}, job_PostedTime: {{ $json.postedTime }}\n}\n\njob_description: {{ $json.description }}\nmy_resume: {{ $('Extract from File1').first().json.text }}\n\n",
+        "options": {}
+      },
+      "id": "63d3aa1a-faf7-49cd-9fd6-dc62c98290d1",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        592,
+        368
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "4333bc6d-0b53-47c9-8332-b532cd728833",
+      "name": "Extract from File1",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        928,
+        -112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "16TiwIDOdpZnXexXhKVlgpyMFoLu_Ubpj",
+          "mode": "list",
+          "cachedResultName": "cv_sample_6.pdf",
+          "cachedResultUrl": ""
+        },
+        "options": {}
+      },
+      "id": "ea15cddb-2b6f-4093-8d81-d2a8f6f7cdfd",
+      "name": "Download file1",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        688,
+        -112
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SfREitRTEg6nouhn",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "auto_job_n8n",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 490993463,
+          "mode": "list",
+          "cachedResultName": "result_n8n",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "jobid",
+              "displayName": "jobid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "applyUrl",
+              "displayName": "applyUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "coverLetter",
+              "displayName": "coverLetter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "applicants",
+              "displayName": "applicants",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postedTime",
+              "displayName": "postedTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "",
+      "name": "Append or update row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1200,
+        368
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003499400259",
+        "text": "=Title: {{ $('Modify Job Attributes').item.json.title }}\nCompany: {{ $('Modify Job Attributes').item.json.company }}\nLocation: {{ $('Modify Job Attributes').item.json.location }}\nJob Score: {{ $json.originalData.score }}\nTotal Applicatnts: {{ $('Modify Job Attributes').item.json.applicants}}\nJOb Posted_Time: {{ $('Modify Job Attributes').item.json.postedTime}}\nApply: {{ $('Modify Job Attributes').item.json.applyUrl }}\n\nCopy Cover Letter from here - ",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "f7561f9c-7b11-4e76-bd13-cb9c16e7c6a4",
+      "name": "Send a text message1",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2672,
+        224
+      ],
+      "webhookId": "17b9ebe8-c8d4-4bd9-ad20-45842ddc2c00",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "gJoWsn3a4ZWzpBOj",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "auto_job_n8n",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 13166167,
+          "mode": "list",
+          "cachedResultName": "test Query",
+          "cachedResultUrl": ""
+        },
+        "options": {}
+      },
+      "id": "",
+      "name": "Get row(s) in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1152,
+        -112
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let url = \"https://www.linkedin.com/jobs/search/?f_TPR=r43200\"\n\n// let url = \"https://www.stepstone.de/work/\"\n\nconst keyword = $input.first().json.Keyword\nconst location =  $input.first().json.Location\nconst experienceLevel = $input.first().json['Experience Level']\nconst remote = $input.first().json.Remote\nconst jobType = $input.first().json['Job Type']\nconst easyApply = $input.first().json['Easy Apply']\n\nif (keyword != \"\") {\n  url += `&keywords=${keyword}`;\n}\n\nif (location != \"\") {\n  url += `&location=${location}`;\n}\n\nif (experienceLevel) {\n  // we have experienceLevel as a string with values like \"Internship, Entry level\"\n  // we  transform it to \"1,2,3\" where:\n  // Internship -> 1\n  // Entry level -> 2\n  // Associate -> 3\n  // Mid-Senior level -> 4\n  // Director -> 5\n  // Executive -> 6\n  const transformedExperiences = experienceLevel.split(\",\")\n    .map((exp) => {\n      switch (exp.trim()) {\n        case \"Internship\":\n          return \"1\";\n        case \"Entry level\":\n          return \"2\";\n        case \"Associate\":\n          return \"3\";\n        case \"Mid-Senior level\":\n          return \"4\";\n        case \"Director\":\n          return \"5\";\n        case \"Executive\":\n          return \"6\";\n        default:\n          return \"\";\n      }\n    })\n    .filter(Boolean); // filter out any empty strings\n  url += `&f_E=${transformedExperiences.join(\",\")}`;\n}\n\n// if (remote.length) {\n\nif (typeof remote === \"string\" && remote.trim() !== \"\") {\n  // we have location as a string with values like \"Remote, Hybrid\"\n  // we transform it to \"2,3,1\" where:\n  // On-Site -> 1\n  // Remote -> 2\n  // Hybrid -> 3\n  const transformedRemote = remote\n    .split(\",\")\n    .map((e) => {\n      switch (e.trim()) {\n        case \"Remote\":\n          return \"2\";\n        case \"Hybrid\":\n          return \"3\";\n        case \"On-Site\":\n          return \"1\";\n        default:\n          return \"\";\n      }\n    })\n    .filter(Boolean); // filter out any empty strings\n  url += `&f_WT=${transformedRemote.join(\",\")}`;\n}\n\nif (jobType) {\n  // we have jobType as a string with values like \"Full-time, Part-time\"\n  // we transform it to \"F,P\" where:\n  // Full-time -> F\n  // Part-time -> P\n  // Contract -> C\n  // Temporary -> T\n  // Other -> O\n  // Internship -> I\n  const transformedJobType = jobType.split(\",\").map((type) => type.trim().charAt(0).toUpperCase());\n  url += `&f_JT=${transformedJobType.join(\",\")}`;\n}\n\nif (easyApply) {\n  url += \"&f_EA=true\";\n}\n\nreturn {url}"
+      },
+      "id": "9558c0bd-c03f-4ce2-9d1d-79f7991a8561",
+      "name": "Create search URL1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1504,
+        -112
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "id": "4273e56b-57be-4b6f-b95b-0b6e7b84b9c9",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        480,
+        -112
+      ],
+      "notesInFlow": false,
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "id": "0bd60f4f-e9a7-46f8-a19e-0d3ecfadea1f",
+      "name": "Fetch Jobs from Linkedin1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1808,
+        -112
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.links }}",
+        "options": {}
+      },
+      "id": "4c79783b-8437-4fe4-8487-78dcea63bc16",
+      "name": "Fetch Job Page1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        672,
+        80
+      ],
+      "executeOnce": false,
+      "retryOnFail": true,
+      "typeVersion": 4.2,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.output.replaceAll(/```(?:json)?/g, \"\").replace(/`+$/g, \"\") }}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "7001c446-bc4f-444f-bb13-6701b0ce278e",
+      "name": "Parse AI Output1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        960,
+        368
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "div h1"
+            },
+            {
+              "key": "company",
+              "cssSelector": "div span a"
+            },
+            {
+              "key": "location",
+              "cssSelector": "div span[class*='topcard__flavor topcard__flavor--bullet']"
+            },
+            {
+              "key": "description",
+              "cssSelector": "div.description__text.description__text--rich"
+            },
+            {
+              "key": "jobid",
+              "cssSelector": "a[data-item-type='semaphore']",
+              "returnValue": "attribute",
+              "attribute": "data-semaphore-content-urn"
+            },
+            {
+              "key": "applicants",
+              "cssSelector": "span.num-applicants, [data-test-job-details-applicants], span[data-test-job-details-applicants-text], figcaption.num-applicants__caption, figure.num-applicants__figure span.num-applicants__caption, [class*='num-applicants__caption']"
+            },
+            {
+              "key": "postedTime",
+              "cssSelector": "span.posted-time-ago__text.posted-time-ago__text--new.topcard__flavor--metadata"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d02bd927-d0a5-4f1f-bd16-1b79751130f4",
+      "name": "Parse Job Attributes1",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        880,
+        80
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "784ead57-9d83-4e08-b83c-23fa165bf045",
+              "name": "description",
+              "type": "string",
+              "value": "={{ $json.description.replaceAll(/\\s+/g, \" \") }}"
+            },
+            {
+              "id": "fd3c9d2c-5ff9-46a7-b70a-f990fbc7da9d",
+              "name": "jobid",
+              "type": "string",
+              "value": "={{ $json.jobid.split(\":\").last() }}"
+            },
+            {
+              "id": "27a20cd2-ab0d-42b7-9cee-ea64e0e26ea3",
+              "name": "applyUrl",
+              "type": "string",
+              "value": "={{ \"https://www.linkedin.com/jobs/view/\"+ $json.jobid.split(\":\").last() }} "
+            },
+            {
+              "id": "a3e94d60-facf-4470-bbcd-585a96eec9cb",
+              "name": "applicants",
+              "value": "={{ \n    $json.applicants \n    ?.match(/(\\\\d+(?:\\\\+|\\\\s*Bewerber:innen|\\\\s*to apply))/i)?.[0] \n    || $json.applicants \n    || 'N/A' \n  }}",
+              "type": "string"
+            },
+            {
+              "id": "345917b0-f781-4c71-9b96-54be96a6a158",
+              "name": "postedTime",
+              "value": "={{ $json.postedTime?.trim() || 'N/A' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "54707bd0-196b-4890-b510-e92740eaaae0",
+      "name": "Modify Job Attributes1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1104,
+        80
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "links",
+              "cssSelector": "ul.jobs-search__results-list li div a[class*=\"base-card\"]",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "75417be9-fdc9-4b6c-a4dc-b1d08ad05d34",
+      "name": "Extract Job Links1",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        2112,
+        -112
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        592,
+        560
+      ],
+      "id": "0b1e951a-385d-4ff6-8269-2d84e165878b",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "49uVSHn0t3Q7jxXS",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 4
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2352,
+        272
+      ],
+      "id": "69c18f8d-4f19-4afd-872f-106e90dd31e2",
+      "name": "Wait3",
+      "webhookId": "a61e572f-d512-4c1f-a0c7-df430eda2fa1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60464a92-373b-4d24-8829-f55ad70221a2",
+              "name": "keepOriginal",
+              "value": "={{ \n  (typeof $json.applicants === 'number' && $json.applicants >= 1 && $json.applicants <= 10) ||\n  (typeof $json.applicants === 'string' && (\n    $json.applicants.includes('Gehören Sie') ||\n    $json.applicants.includes('Be among') ||\n    $json.applicants.includes('ersten')\n  ))\n}}\n",
+              "type": "string"
+            },
+            {
+              "id": "d80729bc-f8f6-45c3-afb9-7be10fef90f7",
+              "name": "originalData",
+              "value": "={{delete $json.output && $json}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        368
+      ],
+      "id": "c6245884-67bb-47e2-83e0-e170be1874df",
+      "name": "Edit Fields1",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Fetch Job Page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Filter1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Create search URL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create search URL1": {
+      "main": [
+        [
+          {
+            "node": "Fetch Jobs from Linkedin1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Download file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Jobs from Linkedin1": {
+      "main": [
+        [
+          {
+            "node": "Extract Job Links1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Job Page1": {
+      "main": [
+        [
+          {
+            "node": "Parse Job Attributes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Output1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Job Attributes1": {
+      "main": [
+        [
+          {
+            "node": "Modify Job Attributes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modify Job Attributes1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Job Links1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Score Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "24ce4b94-e2f8-4c27-9610-0fc45b9410a1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2352b6e9f575e29ae612b8294592c05775ade39d453c6d6acf34d912833614fb"
+  },
+  "id": "7H3lm1kcDHuxVbDi",
+  "tags": []
+}
